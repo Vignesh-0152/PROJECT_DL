@@ -1,0 +1,325 @@
+input(640,640,3)
+
+BACKBONE:
+
+conv2d(32, (1,1), stride=2, padding='same')                                     (320,320,32)
+batchnormalization()
+swish()
+
+conv2d(64, (1,1), stride=1, padding='same')                                     (320,320,64)
+batchnormalization()
+swish()
+
+resnet(1):
+    bottleneck(1)
+        conv2d(int(64/2), (1,1), stride=1, padding='same')
+        batchnormalization()
+        swish()
+
+        conv2d(int(64/2), (3,3), stride=1, padding='same')
+        batchnormalization()
+        swish()
+
+        conv2d(64, (1,1), stride=1, padding='same')
+        x = batchnormalization()
+        
+    add(input, x)
+    swish()
+
+conv2d(128, (1,1), stride=2, padding='same')                                    (160,160,128)
+batchnormalization()
+swish()
+
+c2f(1): 
+    conv2d(256, (1,1), stride=2, padding='same')                                (80,80,256)
+    batchnormalization()
+    swish()
+
+    split into 4 parts: a, b, c, d
+
+    a:(resnet)
+        bottleneck(2): (input)
+            conv2d(int(64/2), (1,1), stride=1, padding='same')
+            batchnormalization()
+            swish()
+
+            conv2d(int(64/2), (3,3), stride=1, padding='same')
+            batchnormalization()
+            swish()
+
+            x = conv2d(64, (1,1), stride=1, padding='same')
+            batchnormalization()
+
+        add(input, x)
+        a = swish()
+
+    b: 
+        csp(1): (input)
+
+            split into 2 parts: x, y
+
+            x:
+                bottleneck(3): (input)
+                    conv2d(int(64/2), (1,1), stride=1, padding='same')
+                    batchnormalization()
+                    swish()
+
+                    conv2d(int(64/2), (3,3), stride=1, padding='same')
+                    batchnormalization()
+                    swish()
+
+                    conv2d(64, (1,1), stride=1, padding='same')
+                    batchnormalization()
+
+                    se(inside_csp):
+                        globalaveragepooling()
+                        dense(int(64/4))
+                        batchnormalization()
+                        swish()
+                        dense(64)
+                        batchnormalization()
+                        sigmoid()
+                        x = reshape((1,1,64))
+                        multiply([input,x])
+
+                add(input, x)
+                swish()
+
+            concatenate([x, y])
+
+    c:
+        bottleneck(4)
+            conv2d(int(64/2), (1,1), stride=1, padding='same')
+            batchnormalization()
+            swish()
+
+            conv2d(int(64/2), (3,3), stride=1, padding='same')
+            batchnormalization()
+            swish()
+
+            conv2d(64, (1,1), stride=1, padding='same')
+            x = batchnormalization()
+
+            se(inside_c_block):
+                globalaveragepooling()
+                dense(int(64/4))
+                batchnormalization()
+                swish()
+                dense(64)
+                batchnormalization()
+                sigmoid()
+                x = reshape((1,1,64))
+                multiply([input,x])
+
+        add(input, x)
+        swish()
+
+    x = concatenate([a, b, c, d])
+
+c3 = conv2d(512, (3,3), stride=1, padding='same')(x)                            (80,80,512)                                
+batchnormalization()
+swish()
+
+conv2d(256, (1,1), stride=2, padding='same')(x)                                 (40,40,256)
+batchnormalization()
+swish()
+
+conv2d(256, (3,3), stride=1, padding='same')
+batchnormalization()
+swish()
+
+spp(1): (input)
+    MaxPool2d(1): ((5,5), stride=1, padding='same')
+    MaxPool2d(2): ((9,9), stride=1, padding='same')
+    MaxPool2d(3): ((13,13), stride=1, padding='same')
+
+    concatenate([input, MaxPool2d(1), MaxPool2d(2), MaxPool2d(3)])              (40,40,1024)
+
+se(1): (input)
+    globalaveragepooling()
+    dense(int(1024/4))
+    batchnormalization()
+    swish()
+
+    dense(1024)
+    batchnormalization()
+    sigmoid()
+
+    x = reshape((1,1,1024))
+    multiply([input,x])                                                         (40,40,1024)
+    c4 = dropout(0.1)
+
+conv2d(2048,(1,1),stride = 2)                                                   (20,20,2048)
+batchnormalization()
+swish()
+    
+conv2d(2048,(3,3),stride = 1)
+batchnormalization()
+swish()
+
+se(1): (input)
+    globalaveragepooling()
+    dense(int(2048/4))
+    batchnormalization()
+    swish()
+
+    dense(1024)
+    batchnormalization()
+    sigmoid()
+
+    x = reshape((1,1,2048))
+    multiply([input,x])                                                         (20,20,2048)
+    c5 = dropout(0.1)
+
+NECK:
+input:
+    c3 = (80,80,512)
+    c4 = (40,40,1024)
+    c5 = (20,20,2048)
+
+FPN(1):
+    c5:
+        p5_fpn = conv2d(256,(1,1),stride = 1)(c5)
+        p5_fpn = batchnormalization()
+        p5_fpn = swish()                                                         (20,20,256)
+
+    c4: (input: c4,p5_fpn)
+        p5_up = upsampling2d()(p5_fpn)
+        p4_fpn = conv2d(256,(1,1), stride = 1)(c4)
+        p4_out = batchnormalization()
+        p4_out = swish()
+        p4_fpn = add([p4_fpn,p5_up])                                            (40,40,256)
+
+    c3: (input: c3, p4_fpn)
+        p4_up = upsampling2d()(p4_fpn)
+        p3_fpn = conv2d(256,(1,1), stride = 1)(c3)
+        p3_out = batchnormalization()
+        p3_out = swish()
+        p3_fpn = add([p4_up, p3_fpn])                                           (80,80,256)
+    
+    p5_out = conv2d(256, (3,3), stride = 1)(p5_fpn)
+    p5_out = batchnormalization()
+    p5_out = swish() 
+    p5_out = dropout(0.05)                                                      (20,20,256)
+
+    p4_out = conv2d(256, (3,3), stride = 1)(p4_fpn)
+    p4_out = batchnormalization()
+    p4_out = swish()
+    p4_out = dropout(0.05)                                                      (40,40,256)
+    
+    p3_out = conv2d(256, (3,3), stride = 1)(p3_fpn)
+    p3_out = batchnormalization()
+    p3_out = swish()
+    p3_out = dropout(0.05)                                                      (80,80,256)
+
+PANet(1):
+    input:
+        p3_out, p4_out, p5_out
+
+    p4:
+        p3_down = conv2d(256, (1,1), stride = 2)(p3_out)
+        p3_down = batchnormalization()
+        p3_down = swish()
+
+        p4_pan = concatenate()([p4_out, p3_donw])                               (40,40,256)
+    
+    p5: 
+        p4_down = conv2d(256, (1,1), stride = 2)(p3_pan)
+        p4_down = batchnormalization()
+        p4_down = swish()
+
+        p5_pan = concatenate()([p5_out, p4_donw])                               (20,20,256)
+    
+    p3_pan_out = conv2d(256, (3,3), stride = 1)(p3_out)
+    p3_pan_out = batchnormalization()
+    p3_pan_out = swish()
+    p3_pan_out = dropout(0.05)                                                  (80,80,256)
+
+    p4_pan_out = conv2d(256, (3,3), stride = 1)(p4_pan)
+    p4_pan_out = batchnormalization()
+    p4_pan_out = swish()
+    p4_pan_out = dropout(0.05)                                                  (40,40,256)
+
+    p5_pan_out = conv2d(256, (3,3), stride = 1)(p5_pan)
+    p5_pan_out = batchnormalization()
+    p5_pan_out = swish()
+    p5_pan_out = dropout(0.05)                                                  (20,20,256)
+
+HEAD:
+    input: 
+        p5 = p5_pan_out
+        p4 = p4_pan_out
+        p3 = p3_pan_out
+    
+    head_p5: (input: p5)
+        se(inside_head_h5):
+            globalaveragepooling()
+            dense(int(256/4))
+            batchnormalization()
+            swish()
+            dense(256)
+            batchnormalization()
+            sigmoid()
+            x = reshape((1,1,256))
+            p5 = multiply([input,x])
+
+        p5 = conv2d(256,(3,3),stride = 1)
+        p5 = batchnormalization()
+        p5 = swish()
+
+        box_detection:
+            p5 = conv2d(256, (3,3), stride = 1)
+            p5 = batchnormalization()
+            p5 = swish()
+
+            p5_output = conv2d(4, (1,1), stride = 1)
+
+    head_p4: (input: p4)
+        se(inside_head_h4):
+            globalaveragepooling()
+            dense(int(256/4))
+            batchnormalization()
+            swish()
+            dense(256)
+            batchnormalization()
+            sigmoid()
+            x = reshape((1,1,256))
+            p4 = multiply([input,x])
+
+        p4 = conv2d(256,(3,3),stride = 1)
+        p4 = batchnormalization()
+        p4 = swish()
+
+        class_detection:
+            p4 = conv2d(256, (3,3), stride = 1)
+            p4 = batchnormalization()
+            p4 = swish()
+
+            p4_output = conv2d(class, (1,1), stride = 1)
+            p4_output = batchnormalization()
+            p4_output = sigmoid()
+
+    head_p3: (input: p3)
+        se(inside_head_h5):
+             globalaveragepooling()
+            dense(int(256/4))
+            batchnormalization()
+            swish()
+            dense(256)
+            batchnormalization()
+            sigmoid()
+            x = reshape((1,1,256))
+            p3 = multiply([input,x])
+
+        p3 = conv2d(256,(3,3),stride = 1)
+        p3 = batchnormalization()
+        p3 = swish()
+
+        box_detection:
+            p3 = conv2d(256, (3,3), stride = 1)
+            p3 = batchnormalization()
+            p3 = swish()
+
+            p3_output = conv2d(4, (1,1), stride = 1)
+            p3_output = batchnormalization()
+            p3_output = sigmoid()

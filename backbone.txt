@@ -1,0 +1,167 @@
+input(640,640,3)
+
+conv2d(32, (1,1), stride=2, padding='same')
+batchnormalization()
+silu()
+
+conv2d(64, (1,1), stride=1, padding='same')
+batchnormalization()
+silu()
+
+resnet(1):
+    bottleneck(1)
+        conv2d(int(64/2), (1,1), stride=1, padding='same')
+        batchnormalization()
+        silu()
+
+        conv2d(int(64/2), (3,3), stride=1, padding='same')
+        batchnormalization()
+        silu()
+
+        conv2d(64, (1,1), stride=1, padding='same')
+        x = batchnormalization()
+        
+    add(input, x)
+    silu()
+
+conv2d(128, (1,1), stride=2, padding='same')
+batchnormalization()
+silu()
+
+c2f(1): 
+    conv2d(256, (1,1), stride=2, padding='same')
+    batchnormalization()
+    silu()
+
+    split into 4 parts: a, b, c, d
+
+    a:
+        bottleneck(2): (input)
+            conv2d(int(64/2), (1,1), stride=1, padding='same')
+            batchnormalization()
+            silu()
+
+            conv2d(int(64/2), (3,3), stride=1, padding='same')
+            batchnormalization()
+            silu()
+
+            x = conv2d(64, (1,1), stride=1, padding='same')
+            batchnormalization()
+
+        add(input, x)
+        a = silu()
+
+    b: 
+        csp(1): (input)
+
+            split into 2 parts: x, y
+
+            x:
+                bottleneck(3): (input)
+                    conv2d(int(64/2), (1,1), stride=1, padding='same')
+                    batchnormalization()
+                    silu()
+
+                    conv2d(int(64/2), (3,3), stride=1, padding='same')
+                    batchnormalization()
+                    silu()
+
+                    conv2d(64, (1,1), stride=1, padding='same')
+                    batchnormalization()
+
+                    se(inside_csp):
+                        globalaveragepooling()
+                        dense(int(64/4))
+                        batchnormalization()
+                        silu()
+                        dense(64)
+                        batchnormalization()
+                        sigmoid()
+                        x = reshape((1,1,64))
+                        multiply([input,x])
+
+                add(input, x)
+                silu()
+
+            concatenate([x, y])
+
+    c:
+        bottleneck(4)
+            conv2d(int(64/2), (1,1), stride=1, padding='same')
+            batchnormalization()
+            silu()
+
+            conv2d(int(64/2), (3,3), stride=1, padding='same')
+            batchnormalization()
+            silu()
+
+            conv2d(64, (1,1), stride=1, padding='same')
+            x = batchnormalization()
+
+            se(inside_c_block):
+                globalaveragepooling()
+                dense(int(64/4))
+                batchnormalization()
+                silu()
+                dense(64)
+                batchnormalization()
+                sigmoid()
+                x = reshape((1,1,64))
+                multiply([input,x])
+
+        add(input, x)
+        silu()
+
+    concatenate([a, b, c, d])
+
+conv2d(256, (1,1), stride=2, padding='same')
+batchnormalization()
+silu()
+
+conv2d(256, (3,3), stride=1, padding='same')
+batchnormalization()
+silu()
+
+spp(1): (input)
+    MaxPool2d(1): ((5,5), stride=1, padding='same')
+    MaxPool2d(2): ((9,9), stride=1, padding='same')
+    MaxPool2d(3): ((13,13), stride=1, padding='same')
+
+    concatenate([input, MaxPool2d(1), MaxPool2d(2), MaxPool2d(3)])
+
+se(1): (input)
+    globalaveragepooling()
+    dense(int(1024/4))
+    batchnormalization()
+    silu()
+
+    dense(1024)
+    batchnormalization()
+    sigmoid()
+
+    x = reshape((1,1,1024))
+    multiply([input,x])
+    
+    dropout(0.1)  # Optional, helps generalization
+
+Backbone Architecture Description (Academic Version):
+The proposed backbone architecture is a custom-designed convolutional feature extractor intended for high-performance object detection, particularly in the domains of traffic monitoring and accident detection. The design initiates with two successive convolutional layers employing 1×1 kernels. The first layer incorporates a stride of 2 to perform initial downsampling, while both layers are followed by Batch Normalization and the SiLU (Sigmoid Linear Unit) activation function. The use of SiLU ensures smooth and non-monotonic activation, contributing to improved gradient flow and convergence stability during training.
+
+Subsequently, the architecture integrates a modified ResNet-style bottleneck block with residual connections. This promotes feature reuse and mitigates the vanishing gradient problem, thereby supporting deeper and more expressive representations. The model then advances into a Cross Stage Feature Fusion (C2F) module that includes multiple parallel branches: standard bottleneck units, a Cross Stage Partial (CSP) block, and a dedicated convolutional path. Notably, select bottlenecks and the CSP block are augmented with Squeeze-and-Excitation (SE) attention modules. These components enable adaptive recalibration of channel-wise features, enhancing the network’s focus on informative regions.
+
+The architecture proceeds with additional convolutional layers where the number of filters increases while spatial resolution decreases, a common strategy to facilitate higher-level semantic abstraction. A Spatial Pyramid Pooling (SPP) module is introduced thereafter, comprising parallel max-pooling operations with kernel sizes of 5×5, 9×9, and 13×13. This module enables multi-scale feature aggregation without additional depth, thereby enriching the receptive field. At the final stage of the backbone, a global SE block is employed to refine the channel descriptors, followed by a Dropout layer with a rate of 0.1. The dropout serves as a regularization technique to improve generalization and reduce the likelihood of overfitting.
+
+In comparison to state-of-the-art architectures such as those employed in the YOLO family (e.g., YOLOv5 and YOLOv8), the proposed backbone demonstrates competitive structural efficiency. Similar to YOLOv8, it utilizes the SiLU activation function throughout the initial layers. However, it further distinguishes itself by embedding SE attention mechanisms, which are not present in standard YOLO configurations. Moreover, while YOLO models primarily leverage ELAN or C2F blocks for feature propagation, this architecture combines C2F with residual learning via ResNet and CSP modules. This hybridization allows for enhanced feature diversity, efficient gradient propagation, and improved representational power. The SPP module employed herein follows the traditional design (as opposed to the faster SPPF variant used in YOLOv5), thereby retaining richer spatial hierarchies.
+
+In summary, the proposed backbone is a highly modular and scalable convolutional feature extractor that effectively integrates residual learning, multi-branch fusion, spatial pooling, and attention mechanisms. Its construction makes it well-suited for complex visual recognition tasks and real-time object detection in traffic and surveillance applications, particularly when computational constraints are less stringent, such as in desktop environments.
+Input: (640, 640, 3)
+
+Conv2D(32, 1x1, stride=2)         → (320, 320, 32)  
+Conv2D(64, 1x1, stride=1)         → (320, 320, 64)  
+ResNet(1)                         → (320, 320, 64)  
+Conv2D(128, 1x1, stride=2)        → (160, 160, 128)  
+C2F Block                         → (80, 80, 256)  
+Conv2D(256, 1x1, stride=2)        → (40, 40, 256)  
+Conv2D(256, 3x3, stride=1)        → (40, 40, 256)  
+SPP Block (Concat 4x)             → (40, 40, 1024)  
+SE(1)                             → (40, 40, 1024)  
