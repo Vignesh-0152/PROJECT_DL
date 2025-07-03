@@ -8,3 +8,5 @@ from .SPP import SPP
 from .SEBlock import SEBlock
 from .upsampleandadd import upsampleandadd
 from .FPN import FPN
+from .downandconcat import downandconcat
+from .PANnet import PANet
