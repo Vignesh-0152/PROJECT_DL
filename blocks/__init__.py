@@ -6,4 +6,5 @@ from .CspWithBottleneckWithSE import CspWithBottleneckWithSE
 from .c2f import c2f
 from .SPP import SPP
 from .SEBlock import SEBlock
-
+from .upsampleandadd import upsampleandadd
+from .FPN import FPN
