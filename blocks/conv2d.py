@@ -17,7 +17,7 @@ class conv2d(Layer):
             strides(int): The stride that Conv2d kernel should move.( default: 1)
     """
 
-    def __init__(self, filters = 64, kernel_size = (1,1), strides = 1):
+    def __init__(self, filters= 64, kernel_size = (1,1), strides = 1):
         super().__init__()
         self.filters = filters
         self.kernel_size = kernel_size
