@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Layer, Dropout
-from tensorflow.keras.regularizers import l2
 from .conv2d import conv2d
 from .upsampleandadd import upsampleandadd
 
@@ -41,7 +40,7 @@ class FPN(Layer):
             - Designed to be compatible with YOLOv8-style anchor-free models.
 
     """
-    
+
     def __init__(self):
         super().__init__()
     
