@@ -4,11 +4,23 @@ from .conv2d import conv2d
 from .downandconcat import downandconcat
 
 class PANet(Layer):
+    """
+    Path Aggregation Network (PANet):
+        Bottom-up path enhancement that reinforces shallow features
+        using downsampled deep features. Follows YOLOv8-style PAN logic.
+    
+    Input:
+        p3: High-res feature map from FPN (B, H/8, W/8, 256)
+        p4: Mid-res feature map from FPN (B, H/16, W/16, 256)
+        p5: Low-res feature map from FPN (B, H/32, W/32, 256)
 
+    Output:
+        p3_pan_out: Enhanced high-res output (B, H/8, W/8, 256)
+        p4_pan_out: Enhanced mid-res output (B, H/16, W/16, 256)
+        p5_pan_out: Enhanced low-res output (B, H/32, W/32, 256)
+    """
     def __init__(self):
         super().__init__()
-
-    def build(self, input_shape):
         self.p3_p4_downandconcat = downandconcat()
         self.p4_p5_downandconcat = downandconcat()
         self.convp3 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)

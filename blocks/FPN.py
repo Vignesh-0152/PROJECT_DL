@@ -43,8 +43,6 @@ class FPN(Layer):
 
     def __init__(self):
         super().__init__()
-    
-    def build(self):
         self.convc5 = conv2d(filters = 256, kernel_size = (1,1), strides = 1)
         self.upsample4 = upsampleandadd()
         self.upsample3 = upsampleandadd()
