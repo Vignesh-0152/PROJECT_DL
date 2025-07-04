@@ -268,11 +268,29 @@ HEAD:
         p5 = swish()
 
         box_detection:
-            p5 = conv2d(256, (3,3), stride = 1)
-            p5 = batchnormalization()
-            p5 = swish()
+            p5_box = conv2d(256, (3,3), stride = 1)
+            p5_box = batchnormalization()
+            p5_box = swish()
 
-            p5_output = conv2d(4, (1,1), stride = 1)
+            p5_box_output = conv2d(4, (1,1), stride = 1)
+        
+        class_detection:
+            p5_class = conv2d(256, (3,3), stride = 1)
+            p5_class = batchnormalization()
+            p5_class = swish()
+
+            p5_class_output = conv2d(class, (1,1), stride = 1)
+            p5_class_output = batchnormalization()
+            p5_class_output = sigmoid()
+
+        objectness_score:
+            p5_object = conv2d(256, (3,3), stride = 1)
+            p5_object = batchnormalization()
+            p5_object = swish()
+
+            p5_object_output = conv2d(1, (1,1), stride = 1)
+            p5_object_output = batchnormalization()
+            p5_object_output = sigmoid()
 
     head_p4: (input: p4)
         se(inside_head_h4):
@@ -290,18 +308,34 @@ HEAD:
         p4 = batchnormalization()
         p4 = swish()
 
-        class_detection:
-            p4 = conv2d(256, (3,3), stride = 1)
-            p4 = batchnormalization()
-            p4 = swish()
+        box_detection:
+            p4_box = conv2d(256, (3,3), stride = 1)
+            p4_box = batchnormalization()
+            p4_box = swish()
 
-            p4_output = conv2d(class, (1,1), stride = 1)
-            p4_output = batchnormalization()
-            p4_output = sigmoid()
+            p4_box_output = conv2d(4, (1,1), stride = 1)
+        
+        class_detection:
+            p4_class = conv2d(256, (3,3), stride = 1)
+            p4_class = batchnormalization()
+            p4_class = swish()
+
+            p4_class_output = conv2d(class, (1,1), stride = 1)
+            p4_class_output = batchnormalization()
+            p4_class_output = sigmoid()
+
+        objectness_score:
+            p4_object = conv2d(256, (3,3), stride = 1)
+            p4_object = batchnormalization()
+            p4_object = swish()
+
+            p4_object_output = conv2d(1, (1,1), stride = 1)
+            p4_object_output = batchnormalization()
+            p4_object_output = sigmoid()
 
     head_p3: (input: p3)
         se(inside_head_h5):
-             globalaveragepooling()
+            globalaveragepooling()
             dense(int(256/4))
             batchnormalization()
             swish()
@@ -315,11 +349,27 @@ HEAD:
         p3 = batchnormalization()
         p3 = swish()
 
-        box_detection:
-            p3 = conv2d(256, (3,3), stride = 1)
-            p3 = batchnormalization()
-            p3 = swish()
+       box_detection:
+            p3_box = conv2d(256, (3,3), stride = 1)
+            p3_box = batchnormalization()
+            p3_box = swish()
 
-            p3_output = conv2d(4, (1,1), stride = 1)
-            p3_output = batchnormalization()
-            p3_output = sigmoid()
+            p3_box_output = conv2d(4, (1,1), stride = 1)
+        
+        class_detection:
+            p3_class = conv2d(256, (3,3), stride = 1)
+            p3_class = batchnormalization()
+            p3_class = swish()
+
+            p3_class_output = conv2d(class, (1,1), stride = 1)
+            p3_class_output = batchnormalization()
+            p3_class_output = sigmoid()
+
+        objectness_score:
+            p3_object = conv2d(256, (3,3), stride = 1)
+            p3_object = batchnormalization()
+            p3_object = swish()
+
+            p3_object_output = conv2d(1, (1,1), stride = 1)
+            p3_object_output = batchnormalization()
+            p3_object_output = sigmoid()
