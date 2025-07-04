@@ -10,3 +10,4 @@ from .upsampleandadd import upsampleandadd
 from .FPN import FPN
 from .downandconcat import downandconcat
 from .PANnet import PANet
+from .headblock import headblock
