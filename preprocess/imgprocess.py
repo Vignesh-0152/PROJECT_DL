@@ -1,7 +1,7 @@
 import tensorflow as tf
 from os import listdir
 from os.path import join, exists
-
+import numpy as np
 class imgprocess():
     """
         Image Pre-Processing:
@@ -34,14 +34,14 @@ class imgprocess():
     
     def decoding_input(self):
         x, y_20, y_40, y_80 = [], [], [], []
-        max_cls = -1
+        max_cls = tf.cast(-1.0, dtype=tf.float32)  # or just -1.0 if using Python only
 
         for fname in listdir(self.x_train):
             if not fname.lower().endswith(('.png', '.jpg', '.jpeg')):
                 continue
             
             img_path = join(self.x_train, fname)
-            label_path = join(self.y_train, fname.split('.')[0] + '.txt')
+            label_path = join(self.y_train, fname.rsplit('.',1)[0] + '.txt')
 
             img = tf.io.read_file(img_path)
             img = tf.image.decode_image(img, channels= 3)
@@ -58,9 +58,10 @@ class imgprocess():
                     for line in f:
                         cls, cx, cy, w, h = map(float, line.strip().split())
                         
+                        cls = float(cls)
                         if cls > max_cls:
                             max_cls = cls
-
+                        # print(max_cls)
                         W = w * self.input_size
                         H = h * self.input_size
                         avg_dim = tf.reduce_mean([W,H])
@@ -82,38 +83,43 @@ class imgprocess():
                         cy_grid = cy_cell - tf.cast(gy, tf.float32)
 
                         output = [cx_grid, cy_grid, w, h, 0.9, cls]
-
+                        # print(output)
+                        index = tf.convert_to_tensor([[gy, gx, 0]], dtype=tf.int32)
+                        update = tf.convert_to_tensor([output], dtype=tf.float32)
                         if grid_size == 80:
                             label_80 = tf.tensor_scatter_nd_update(
                                 tensor= label_80,
-                                indices= [[gy, gx, 0]],
-                                updates= [output]
+                                indices= index,
+                                updates= update
                             )
+                            
 
-                        if grid_size == 40:
+                            
+                        elif grid_size == 40:
                             label_40 = tf.tensor_scatter_nd_update(
                                 tensor= label_40,
                                 indices= [[gy, gx, 0]],
                                 updates= [output]
                             )
 
-                        if grid_size == 20:
+                        elif grid_size == 20:
                             label_20 = tf.tensor_scatter_nd_update(
                                 tensor= label_20,
                                 indices= [[gy, gx, 0]],
                                 updates= [output]
                             )
 
+                        
             x.append(img)
             y_20.append(label_20)
             y_40.append(label_40)
             y_80.append(label_80)
-
+            # print(max_cls)
+            
         x = tf.stack(x)
         y_20 = tf.stack(y_20)
         y_40 = tf.stack(y_40)
         y_80 = tf.stack(y_80)
-        y = [y_20, y_40, y_80]
-
+        y = [y_20, y_40, y_80]        
         print("Image pre_processing is done and values are returned:😎✌️")
         return x, y, max_cls
