@@ -3,6 +3,27 @@ from os import listdir
 from os.path import join, exists
 
 class imgprocess():
+    """
+        Image Pre-Processing:
+            This class takes input of Image-path and Label-path for Training, Testing or Validation 
+            and convert them into python tuple. Each images and labels need to converted into Tensor 
+            to be used by training, testing and validation by tensorflow.keras.
+
+        Input:
+            x_train: (path) The path for Image
+            y_train: (path) The path for Label
+            input_size: (int) The input image size(optional and default value is set to 640)
+
+        Output:
+            image: (Tensor) An Tensor contains Normalized values[0-1] of images
+            label: (tuple) contains 3 Tensors each represent the label for 3 different size of boxes
+            cls: (int) The maximum class the input labels have
+
+        Example:
+        >>> dataset = imgprocess(img_path, label_path, 640)
+        >>> print(type(dataset))
+            <preprocess.imgprocess.imgprocess object at 0x00000242A4347C40>
+    """
 
     def __init__(self, x_train, y_train, input_size = 640):
         self.x_train = x_train
