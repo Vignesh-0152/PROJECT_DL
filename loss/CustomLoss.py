@@ -1,18 +1,29 @@
 import tensorflow as tf
-from .IoU import IoU
-from .DIoU import DIoU
-from .aspectRatio import aspectRatio
+from .bbloss import bbloss
 from tensorflow.keras.losses import Loss
+from .classloss import classloss
+from .objloss import objloss
 
 class CustomLoss(Loss):
     def __init__(self):
         super().__init__()
+        self.bb_loss = bbloss()
+        self.class_loss = classloss() 
+        self.ob_loss = objloss()
 
     def call(self, y_true, y_pred):
-        iou = IoU(y_true, y_pred)()
-        diou = DIoU(y_true, y_pred)()
-        aspect_ratio_penalty = aspectRatio(y_true, y_pred)()
+        # bounding box loss
+        bb_loss = self.bb_loss(y_true, y_pred)
 
-        loss = 1 - iou + diou + aspect_ratio_penalty
+        # class loss
+        cls_loss = self.class_loss(y_true, y_pred)
 
-        return loss
+        # object loss
+        ob_loss = self.ob_loss(y_true, y_pred)
+
+        total_loss = (0.5 * bb_loss) + (0.1 * cls_loss) + (0.1 * ob_loss)
+        total_loss = tf.cast(total_loss, tf.float32)
+
+        tf.print("Loss: BB_loss= ", bb_loss, "Ob_loss= ", ob_loss, "Cls_loss= ", cls_loss, "Total_loss= ", total_loss)
+
+        return total_loss
