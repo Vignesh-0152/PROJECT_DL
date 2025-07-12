@@ -5,17 +5,23 @@ class DIoU:
     def __init__(self, y_true, y_pred):
         self.y_true = y_true
         self.y_pred = y_pred
-        self.DIoU_penalty = self.call()
 
-    def __call__(self, *args, **kwds):
-        return self.calculate()
-
-    def __call__(self, *args, **kwds):
+    def __call__(self):
         return self.calculate()
 
     def calculate(self):
-        cx1, cy1, w1, h1 = self.y_true[... , :4]
-        cx2, cy2, w2, h2 = self.y_pred[... , :4]
+        # cx1, cy1, w1, h1 = self.y_true[... , 0:4]
+        true_box = self.y_true[... , :4]
+        cx1 = true_box[... , 0]
+        cy1 = true_box[... , 1]
+        w1 = true_box[... , 2]
+        h1 = true_box[... , 3]
+        # cx2, cy2, w2, h2 = self.y_pred[... , 0:4]
+        pred_box = self.y_pred[... , 0:4]
+        cx2 = pred_box[... , 0]
+        cy2 = pred_box[... , 1]
+        w2= pred_box[... , 2]
+        h2 = pred_box[... , 3]
 
         a = xycalc(cx1, cy1, w1, h1)
         b = xycalc(cx2, cy2, w2, h2)

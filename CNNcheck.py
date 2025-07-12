@@ -6,10 +6,10 @@ from architecture import CNN  # Replace with correct import path if needed
 cls = 3
 # Create functional model wrapper around your CNN(Layer)
 input_tensor = Input(shape=(640, 640, 3))
-h3, h4, h5 = CNN(cls)(input_tensor)
+x = CNN(cls)(input_tensor)
 
 # Create full Keras Model for summary and training
-model = Model(inputs=input_tensor, outputs=[h3, h4, h5], name="CustomObjectDetector")
+model = Model(inputs=input_tensor, outputs=[x], name="CustomObjectDetector")
 
 # Print model summary
 model.summary(line_length= 200)
@@ -20,5 +20,5 @@ outputs = model(dummy_input)
 
 # Print output shapes
 print("\nOutput Shapes:")
-for i, out in enumerate(outputs, start=3):
-    print(f"h{i}: {out.shape}")
+print(outputs.shape)
+
