@@ -46,6 +46,7 @@ class SPP(Layer):
         self.maxpool3 = MaxPool2D(self.size3, strides= 1, padding="same")
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         mp1 = self.maxpool1(input)
         mp2 = self.maxpool2(input)
         mp3 = self.maxpool3(input)

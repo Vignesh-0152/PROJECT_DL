@@ -2,6 +2,8 @@ import tensorflow as tf
 from os import listdir
 from os.path import join, exists
 import numpy as np
+from utils import flattenandconcatenate
+
 class imgprocess():
     """
         Image Pre-Processing:
@@ -30,7 +32,8 @@ class imgprocess():
         self.y_train = y_train
         self.input_size = input_size
         print("This is a auto call class and Image pre_processing is started:😎✌️")
-        self.image, self.label, self.cls = self.decoding_input()
+        self.flatandconcat = flattenandconcatenate()
+        self.image, self.label, self.cls = self.decoding_input()        
     
     def decoding_input(self):
         x, y_20, y_40, y_80 = [], [], [], []
@@ -120,6 +123,6 @@ class imgprocess():
         y_20 = tf.stack(y_20)
         y_40 = tf.stack(y_40)
         y_80 = tf.stack(y_80)
-        y = [y_20, y_40, y_80]        
+        y = self.flatandconcat(y_80, y_40, y_20)        
         print("Image pre_processing is done and values are returned:😎✌️")
         return x, y, max_cls

@@ -60,6 +60,7 @@ class c2f(Layer):
         self.bottleneckwithse = BottleneckWithSE(64, 64, 2, 4)
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.conv2d(input)
         x1, x2, x3, x4 = tf.split(x, num_or_size_splits= self.splitNumber, axis= -1)
         x1 = self.bottleneck(x1)

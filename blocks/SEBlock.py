@@ -51,6 +51,7 @@ class SEBlock(Layer):
         self.activation2 = Activation("sigmoid")
 
     def call(self,input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.globalaveragepool(input)
         x = self.dense1(x)
         x = self.batchnorm1(x)

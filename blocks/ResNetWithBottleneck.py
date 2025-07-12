@@ -43,6 +43,7 @@ class ResNetWithBottleneck(Layer):
         self.activation1 = Activation("swish")
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.bottleneck(input)
         x = tf.add(input, x)
         x = self.activation1(x)
