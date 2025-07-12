@@ -32,8 +32,8 @@ class imgprocess():
         self.y_train = y_train
         self.input_size = input_size
         print("This is a auto call class and Image pre_processing is started:😎✌️")
-        self.image, self.label, self.cls = self.decoding_input()
         self.flatandconcat = flattenandconcatenate()
+        self.image, self.label, self.cls = self.decoding_input()        
     
     def decoding_input(self):
         x, y_20, y_40, y_80 = [], [], [], []
