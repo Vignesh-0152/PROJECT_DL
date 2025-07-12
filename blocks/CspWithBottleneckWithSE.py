@@ -53,6 +53,7 @@ class CspWithBottleneckWithSE(Layer):
             )
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         x1, x2 = tf.split(input, num_or_size_splits = 2, axis = -1)
         x = self.bottleneckwithse(x2)
         x = tf.concat([x1,x], axis = -1)

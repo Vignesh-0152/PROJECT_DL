@@ -51,6 +51,7 @@ class BottleneckWithSE(Layer):
 
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.bottleneck(input)
         x = self.se(x)
         x = tf.add(input, x)

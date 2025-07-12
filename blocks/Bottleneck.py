@@ -63,6 +63,7 @@ class Bottleneck(Layer):
         self.batchnorm3 = BatchNormalization(axis = -1)
 
     def call(self,input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.conv1(input)
         x = self.batchnorm1(x)
         x = self.activation1(x)

@@ -35,6 +35,7 @@ class conv2d(Layer):
         self.activation = Activation("swish")
 
     def call(self, input):
+        input = tf.cast(input, dtype= tf.float32)
         x = self.conv2d(input)
         x = self.batchnorm(x)
         x = self.activation(x)
