@@ -1,8 +1,10 @@
 import tensorflow as tf
 from utils import xycalc
+from tensorflow.keras.losses import Loss
 
-class IoU:
+class IoU(Loss):
     def __init__(self, y_true, y_pred):
+        super().__init__()
         self.y_true = y_true
         self.y_pred = y_pred
 

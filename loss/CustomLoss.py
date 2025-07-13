@@ -24,6 +24,4 @@ class CustomLoss(Loss):
         total_loss = (0.5 * bb_loss) + (0.1 * cls_loss) + (0.1 * ob_loss)
         total_loss = tf.cast(total_loss, tf.float32)
 
-        tf.print("Loss: BB_loss= ", bb_loss, "Ob_loss= ", ob_loss, "Cls_loss= ", cls_loss, "Total_loss= ", total_loss)
-
         return total_loss

@@ -1,10 +1,12 @@
 from .IoU import IoU
 import tensorflow as tf
 from numpy import pi
+from tensorflow.keras.losses import Loss
 
-class aspectRatio:
+class aspectRatio(Loss):
 
     def __init__(self, y_true, y_pred):
+        super().__init__()
         self.y_true = y_true
         self.y_pred = y_pred
 
