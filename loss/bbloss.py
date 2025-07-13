@@ -2,10 +2,11 @@ import tensorflow as tf
 from .IoU import IoU
 from .DIoU import DIoU
 from .aspectRatio import aspectRatio
+from tensorflow.keras.losses import Loss
 
 class bbloss:
     def __init__(self):
-        pass
+        super().__init__()
 
     def __call__(self, y_true, y_pred):
         return self.calculate(y_true= y_true, y_pred= y_pred)
@@ -17,5 +18,7 @@ class bbloss:
 
         bb_loss = 1.0 - iou + diou + aspect_ratio_penalty
         bb_loss = tf.cast(bb_loss, tf.float32)
+
+        bb_loss = tf.reduce_mean(bb_loss)
 
         return bb_loss
