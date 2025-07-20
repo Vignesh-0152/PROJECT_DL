@@ -125,4 +125,4 @@ class imgprocess():
         y_80 = tf.stack(y_80)
         y = self.flatandconcat(y_80, y_40, y_20)        
         print("Image pre_processing is done and values are returned:😎✌️")
-        return x, y, max_cls
+        return x, y, (max_cls+1)
