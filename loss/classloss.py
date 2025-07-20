@@ -16,5 +16,5 @@ class classloss(Loss):
         cls_y_pred = tf.reshape(cls_y_pred, shape= [-1, 3])
         cls_loss = self.scce(cls_y_true, cls_y_pred)
         cls_loss = tf.cast(cls_loss, tf.float32)
-
+        
         return cls_loss
