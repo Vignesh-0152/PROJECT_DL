@@ -50,6 +50,7 @@ class SEBlock(Layer):
         self.activation1 = Activation("swish")
         self.activation2 = Activation("sigmoid")
 
+    
     def call(self,input):
         input = tf.cast(input, dtype= tf.float32)
         x = self.globalaveragepool(input)

@@ -7,7 +7,7 @@ class flattenandconcatenate(Layer):
 
     def call(self, x_80, x_40, x_20):
         x_80 = tf.reshape(x_80, (tf.shape(x_80)[0], -1, tf.shape(x_80)[-1]))
-        x_40 = tf.reshape(x_40, (tf.shape(x_80)[0], -1, tf.shape(x_80)[-1]))
-        x_20 = tf.reshape(x_20, (tf.shape(x_80)[0], -1, tf.shape(x_80)[-1]))
+        x_40 = tf.reshape(x_40, (tf.shape(x_40)[0], -1, tf.shape(x_40)[-1]))
+        x_20 = tf.reshape(x_20, (tf.shape(x_20)[0], -1, tf.shape(x_20)[-1]))
 
         return tf.concat([x_80, x_40, x_20], axis=1)

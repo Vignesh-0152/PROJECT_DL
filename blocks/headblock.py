@@ -1,6 +1,7 @@
 from tensorflow.keras.layers import Layer, Conv2D, BatchNormalization, Activation
 from .SEBlock import SEBlock
 from .conv2d import conv2d
+import tensorflow as tf
 
 class headblock(Layer):
 
@@ -14,6 +15,8 @@ class headblock(Layer):
         self.conv_object = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
 
         self.conv_box_output = Conv2D(4, (1,1), strides = 1, padding = "same")
+        self.batchnorm_box_output = BatchNormalization()
+        self.activation_box_output = Activation("relu")
 
         self.conv_class_output = Conv2D(self.cls, (1,1), strides = 1, padding = "same")
         self.batchnorm_class_output = BatchNormalization()
@@ -30,6 +33,9 @@ class headblock(Layer):
         #box detection:
         px_box = self.conv_box(px)
         px_box_output = self.conv_box_output(px_box)
+        px_box_output = self.batchnorm_box_output(px_box_output)
+        px_box_output = self.activation_box_output(px_box_output)
+        px_box_output = tf.clip_by_value(px_box_output, clip_value_min=0.0, clip_value_max=1.0)
 
         #class detection:
         px_class = self.conv_class(px)

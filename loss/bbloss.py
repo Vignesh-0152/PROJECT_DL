@@ -11,6 +11,7 @@ class bbloss:
     def __call__(self, y_true, y_pred):
         return self.calculate(y_true= y_true, y_pred= y_pred)
 
+    @tf.autograph.experimental.do_not_convert
     def calculate(self, y_true, y_pred):
         iou = IoU(y_true, y_pred)()
         diou = DIoU(y_true, y_pred)()

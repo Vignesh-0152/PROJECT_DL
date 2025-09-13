@@ -10,6 +10,7 @@ class classloss(Loss):
     def __call__(self, y_true, y_pred):
         return self.calculate(y_true= y_true, y_pred= y_pred)
 
+    @tf.autograph.experimental.do_not_convert
     def calculate(self, y_true, y_pred):
         cls_y_true = y_true[... , 5]
         cls_y_pred = y_pred[... , 5:]

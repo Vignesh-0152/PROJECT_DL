@@ -25,7 +25,7 @@ class mAP50():
             max_total_size= self.cls * 100,
             iou_threshold= 0.5,
             score_threshold= 0.5,
-            clip_boxes= False
+            clip_boxes= True
         )
 
         box = nms_output.nmsed_boxes                                            #[B, N, 4]
