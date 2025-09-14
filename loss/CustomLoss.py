@@ -26,4 +26,6 @@ class CustomLoss(Loss):
         total_loss = tf.cast(total_loss, tf.float32)
         total_loss = tf.clip_by_value(total_loss, 1e-6, 1e6)
 
+        print(f"loss is ended -- true: {tf.shape(y_true)} and pred: {tf.shape(y_pred)}")
+
         return total_loss

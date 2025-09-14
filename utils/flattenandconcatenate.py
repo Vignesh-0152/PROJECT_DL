@@ -6,6 +6,11 @@ class flattenandconcatenate(Layer):
         super().__init__()
 
     def call(self, x_80, x_40, x_20):
+        print("Shapes before concat:")
+        print("  x_80:", tf.shape(x_80))
+        print("  x_40:", tf.shape(x_40))
+        print("  x_20:", tf.shape(x_20))
+
         x_80 = tf.reshape(x_80, (tf.shape(x_80)[0], -1, tf.shape(x_80)[-1]))
         x_40 = tf.reshape(x_40, (tf.shape(x_40)[0], -1, tf.shape(x_40)[-1]))
         x_20 = tf.reshape(x_20, (tf.shape(x_20)[0], -1, tf.shape(x_20)[-1]))

@@ -21,8 +21,12 @@ validation_label = r"C:\Users\svign_ggx9gjx\Desktop\soft_computing\VIGNESH\VIGNE
 train = imgprocess(x_train= train_image, y_train= train_label)
 validate = imgprocess(x_train= validation_image, y_train= validation_label)
 
-no_of_class = train.cls
+no_of_class = int(train.cls)
 print(no_of_class)
+print(tf.shape(train_image))
+print(tf.shape(train_label))
+print(tf.shape(validation_image))
+print(tf.shape(validation_label))
 
 input = Input(shape=(640,640,3))
 output = CNN(no_of_class)(input)

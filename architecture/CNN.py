@@ -5,12 +5,12 @@ from .head import head
 from utils import flattenandconcatenate
 
 class CNN(Layer):
-    def __init__(self, cls):
+    def __init__(self, clss):
         super().__init__()
-        self.cls = cls
+        self.cls = clss
         self.backbone = backbone()
         self.neck = neck()
-        self.head = head(cls)
+        self.head = head(clss)
         self.flatandconcat = flattenandconcatenate()
 
     def call(self, input):

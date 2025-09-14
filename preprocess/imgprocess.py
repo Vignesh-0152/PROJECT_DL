@@ -59,8 +59,11 @@ class imgprocess():
             if exists(label_path):
                 with open(label_path, "r") as f:
                     for line in f:
-                        cls, cx, cy, w, h = map(float, line.strip().split())
-                        
+                        try:
+                            cls, cx, cy, w, h = map(float, line.strip().split())
+                        except ValueError:
+                            print("🚨 Bad label format in file:", label_path, "Line:", line)
+                            continue
                         cls = float(cls)
                         if cls > max_cls:
                             max_cls = cls
