@@ -25,5 +25,4 @@ class CNN(Layer):
         # tf.print("h5 shape:", tf.shape(h5))
 
         output = self.flatandconcat(h3, h4, h5)
-        tf.print("CNN output shape:", tf.shape(output))
         return output

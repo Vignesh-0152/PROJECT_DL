@@ -18,16 +18,6 @@ train_label = r"C:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\labels\train"
 validation_image = r"c:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\images\val"
 validation_label = r"C:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\labels\val"
 
-# train = imgprocess(x_train= train_image, y_train= train_label)
-# validate = imgprocess(x_train= validation_image, y_train= validation_label)
-
-# no_of_class.cls = int(train.cls)
-# print(no_of_class.cls)
-# print(tf.shape(train_image))
-# print(tf.shape(train_label))
-# print(tf.shape(validation_image))
-# print(tf.shape(validation_label))
-
 no_of_class = classprocess(train_label)
 
 train = process(train_image, train_label, no_of_class.cls)
@@ -37,10 +27,6 @@ input = Input(shape=(640,640,3))
 output = CNN(no_of_class.cls)(input)
 
 model = Model(input, output)
-
-# print("Train label shape:", train.label.shape)
-# print("Validate label shape:", validate.label.shape)
-# print("Model output shape:", model.output_shape)
 
 learning_rate = PolynomialDecay(
     initial_learning_rate= 1e-3,
