@@ -13,6 +13,7 @@ class aspectRatio(Loss):
     def __call__(self, *args, **kwds):
         return self.calculate()
 
+    @tf.autograph.experimental.do_not_convert
     def calculate(self):
         # cx1, cy1, w1, h1 = self.y_true[... , 0:4]
         true_box = self.y_true[... , :4]
