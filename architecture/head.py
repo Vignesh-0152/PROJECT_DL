@@ -4,12 +4,12 @@ from blocks import headblock
 
 class head(Layer):
     
-    def __init__(self, cls):
+    def __init__(self, clss):
         super().__init__()
-        self.cls = cls
-        self.headblock_p3 = headblock(cls)
-        self.headblock_p4 = headblock(cls)
-        self.headblock_p5 = headblock(cls)
+        self.clss = clss
+        self.headblock_p3 = headblock(clss)
+        self.headblock_p4 = headblock(clss)
+        self.headblock_p5 = headblock(clss)
 
     def call(self, p3, p4, p5):
 
