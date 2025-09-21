@@ -12,7 +12,6 @@ class CustomLoss(Loss):
         self.ob_loss = objloss()
 
     def call(self, y_true, y_pred):
-        print("loss is started")
         # bounding box loss
         bb_loss = self.bb_loss(y_true, y_pred)
 
@@ -25,7 +24,5 @@ class CustomLoss(Loss):
         total_loss = (0.5 * bb_loss) + (0.1 * cls_loss) + (0.1 * ob_loss)
         total_loss = tf.cast(total_loss, tf.float32)
         total_loss = tf.clip_by_value(total_loss, 1e-6, 1e6)
-
-        print(f"loss is ended -- true: {tf.shape(y_true)} and pred: {tf.shape(y_pred)}")
 
         return total_loss

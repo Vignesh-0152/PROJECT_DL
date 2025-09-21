@@ -22,7 +22,7 @@ class classprocess():
     """
     def __init__(self, y_train):
         self.y_train = y_train
-        self.cls = self.process_class()
+        self.clss = self.process_class()
 
     def process_class(self):
         max_cls = tf.cast(-1.0, dtype = tf.float32)
