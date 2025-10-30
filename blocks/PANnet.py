@@ -21,14 +21,16 @@ class PANet(Layer):
     """
     def __init__(self):
         super().__init__()
+    
+    def build(self, input_shape):
         self.p3_p4_downandconcat = downandconcat()
         self.p4_p5_downandconcat = downandconcat()
         self.convp3 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
         self.convp4 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
         self.convp5 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
-        self.drop3 = Dropout(0.05)
-        self.drop4 = Dropout(0.05)
-        self.drop5 = Dropout(0.05)
+        self.drop3 = Dropout(0.1)
+        self.drop4 = Dropout(0.1)
+        self.drop5 = Dropout(0.1)
 
     def call(self, p3, p4, p5):
         p4_pan_out = self.p3_p4_downandconcat(p3, p4)

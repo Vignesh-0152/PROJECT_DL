@@ -8,10 +8,12 @@ import tensorflow as tf
 class CNN(Layer):
     def __init__(self, clss):
         super().__init__()
-        self.cls = clss
+        self.clss = clss
+
+    def build(self, input_shape):
         self.backbone = backbone()
         self.neck = neck()
-        self.head = head(clss)
+        self.head = head(self.clss)
         self.flatandconcat = flattenandconcatenate()
 
     def call(self, input):

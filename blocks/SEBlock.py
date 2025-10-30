@@ -44,7 +44,7 @@ class SEBlock(Layer):
             kernel_regularizer=l2(0.01)
         )
 
-        self.dropout = Dropout(0.05)
+        self.dropout = Dropout(0.1)
         self.batchnorm1 = BatchNormalization(axis = -1)
         self.batchnorm2 = BatchNormalization(axis = -1)
         self.activation1 = Activation("swish")

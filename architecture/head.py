@@ -7,9 +7,11 @@ class head(Layer):
     def __init__(self, clss):
         super().__init__()
         self.clss = clss
-        self.headblock_p3 = headblock(clss)
-        self.headblock_p4 = headblock(clss)
-        self.headblock_p5 = headblock(clss)
+
+    def build(self, input_shape):
+        self.headblock_p3 = headblock(self.clss)
+        self.headblock_p4 = headblock(self.clss)
+        self.headblock_p5 = headblock(self.clss)
 
     def call(self, p3, p4, p5):
 

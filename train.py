@@ -12,11 +12,11 @@ from tensorflow.keras.metrics import Precision, Recall, AUC
 import os 
 import datetime
 
-train_image = r"C:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\images\train"
-train_label = r"C:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\labels\train"
+train_image = r"/kaggle/input/my-yolo-dataset/train/images"
+train_label = r"/kaggle/input/my-yolo-dataset/train/labels"
 
-validation_image = r"c:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\images\val"
-validation_label = r"C:\Users\svign_ggx9gjx\Downloads\Traffic Dataset\labels\val"
+validation_image = r"/kaggle/input/my-yolo-dataset/valid/images"
+validation_label = r"/kaggle/input/my-yolo-dataset/valid/labels"
 
 no_of_class = classprocess(train_label)
 
@@ -29,9 +29,9 @@ output = CNN(no_of_class.clss)(input)
 model = Model(input, output)
 
 learning_rate = PolynomialDecay(
-    initial_learning_rate= 1e-3,
+    initial_learning_rate= 1e-2,
     decay_steps= 60000,
-    end_learning_rate= 1e-6,
+    end_learning_rate= 1e-5,
     power=2,
     name= "learning_rate"
 )
@@ -53,7 +53,7 @@ callbacks.append(LiveTerminalOutput())
 model.fit(
     x= train.image,
     y= train.label,
-    batch_size= 2,
+    batch_size= 8,
     epochs= 200,
     validation_data= (validate.image, validate.label),
     validation_batch_size= 4,

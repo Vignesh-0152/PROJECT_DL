@@ -4,6 +4,8 @@ from tensorflow.keras.layers import Layer
 class neck(Layer):
     def __init__(self):
         super().__init__()
+    
+    def build(self, input_shape):
         self.fpn = FPN()
         self.pan = PANet()
 

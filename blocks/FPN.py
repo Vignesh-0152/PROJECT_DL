@@ -43,15 +43,17 @@ class FPN(Layer):
 
     def __init__(self):
         super().__init__()
+    
+    def build(self, input_shape):
         self.convc5 = conv2d(filters = 256, kernel_size = (1,1), strides = 1)
         self.upsample4 = upsampleandadd()
         self.upsample3 = upsampleandadd()
         self.convp5 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
         self.convp4 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
         self.convp3 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
-        self.drop5 = Dropout(0.05)
-        self.drop4 = Dropout(0.05)
-        self.drop3 = Dropout(0.05)
+        self.drop5 = Dropout(0.1)
+        self.drop4 = Dropout(0.1)
+        self.drop3 = Dropout(0.1)
 
     def call(self, c5, c4, c3):
         p5 = self.convc5(c5)

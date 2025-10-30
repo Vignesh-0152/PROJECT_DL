@@ -5,9 +5,11 @@ import tensorflow as tf
 
 class headblock(Layer):
 
-    def __init__(self, cls):
+    def __init__(self, clss):
         super().__init__()
-        self.cls = cls
+        self.clss = clss
+
+    def build(self, input_shape):
         self.seblock = SEBlock(filters = 256, reductionRate = 4)
         self.conv1 = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
         self.conv_box = conv2d(filters = 256, kernel_size = (3,3), strides = 1)
@@ -18,7 +20,7 @@ class headblock(Layer):
         self.batchnorm_box_output = BatchNormalization()
         self.activation_box_output = Activation("relu")
 
-        self.conv_class_output = Conv2D(self.cls, (1,1), strides = 1, padding = "same")
+        self.conv_class_output = Conv2D(self.clss, (1,1), strides = 1, padding = "same")
         self.batchnorm_class_output = BatchNormalization()
         self.activation_class_output = Activation("sigmoid")
 
