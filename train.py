@@ -12,11 +12,11 @@ from tensorflow.keras.metrics import Precision, Recall, AUC
 import os 
 import datetime
 
-train_image = r"/kaggle/input/my-yolo-dataset/train/images"
-train_label = r"/kaggle/input/my-yolo-dataset/train/labels"
+train_image = r"/kaggle/input/my-yolo-dataset/valid/images"
+train_label = r"/kaggle/input/my-yolo-dataset/valid/labels"
 
-validation_image = r"/kaggle/input/my-yolo-dataset/valid/images"
-validation_label = r"/kaggle/input/my-yolo-dataset/valid/labels"
+validation_image = r"/kaggle/input/my-yolo-dataset/test/images"
+validation_label = r"/kaggle/input/my-yolo-dataset/test/labels"
 
 no_of_class = classprocess(train_label)
 
